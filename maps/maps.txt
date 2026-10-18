@@ -1,0 +1,13 @@
+# name | download url | creator / source page
+# Maps are downloaded from their creators' own pages and are not part of this repo. All credit to
+# the map makers; support them (Lethamyr: https://www.patreon.com/Lethamyr).
+Neon Heights Rings | https://cdn.bakkesplugins.com/uploads/3fa1ee3983c440f9a5dcf139614256ce-LethNeonHeightsRings_1.0.0.zip | Lethamyr - https://bakkesplugins.com/maps/187
+Ice Rings | gdrive:1lZP3KfdZsn2K2WAF92JWuhrnZlU-X5x4 | Lethamyr - https://lethamyr.com
+Lava Rings | gdrive:1_EUc0kD4HSgZlEYHdCkatIn0zTUE2nHM | Lethamyr - https://lethamyr.com
+Medieval Rings | gdrive:1aVh74XgpQ-eyr2PzbfQ64RUK8LjOvi01 | Lethamyr - https://lethamyr.com
+Pinch Distance | https://cdn.bakkesplugins.com/uploads/f7b6b4ac0a0e41e0a4909d22bacea2bb-1.4.zip | Demonik - https://bakkesplugins.com/maps/341
+Pinch Distance Challenge | https://cdn.bakkesplugins.com/uploads/aab5175a9a164dcbacb6a1009cc8d2bf-1.0.51.zip | https://bakkesplugins.com/maps/373
+Pinch Map | https://cdn.bakkesplugins.com/uploads/1b8c1c1d8d8f42f0b17aa722a3447649-Pinchmap_1.0.0.zip | https://bakkesplugins.com/maps/100
+Air Dribble Hoops | bakkesplugins:78 | tjbrother - https://bakkesplugins.com/maps/78
+Air Dribble Challenge | bakkesplugins:343 | https://bakkesplugins.com/maps/343
+Air Dribble Length Map | bakkesplugins:361 | https://bakkesplugins.com/maps/361
