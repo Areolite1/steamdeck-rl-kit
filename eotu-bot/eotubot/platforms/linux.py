@@ -434,6 +434,7 @@ class LinuxPlatform(BasePlatform):
                               f"and /dev/uinput can't be opened ({e}). Run the bot in Desktop Mode.") from e
         self.win = None
         self._mss = None
+        self._cap_mode, self._cap_checked = None, 0.0
         self.notes = []
 
     def describe(self):
@@ -474,6 +475,36 @@ class LinuxPlatform(BasePlatform):
 
     # -- screenshots -------------------------------------------------------------------------
     def capture(self, rect):
+        mode = self._capture_mode()
+        if mode == "spectacle":
+            img = self._capture_spectacle(rect)
+            if img is not None:
+                return img
+        return self._capture_x(rect)
+
+    def _capture_mode(self):
+        """x11 or spectacle. Under Wayland, XWayland can keep handing back an old frame of a Proton
+        game while the real screen moves on, so auto compares the two every few minutes."""
+        mode = self.cfg["input"].get("capture", "auto")
+        if mode != "auto":
+            return mode
+        if not self.x or self.session != "wayland" or not shutil.which("spectacle"):
+            return "x11"
+        now = time.monotonic()
+        if self._cap_mode and now - self._cap_checked < 300:
+            return self._cap_mode
+        self._cap_checked = now
+        rect = self.find_game() or self.screen_rect()
+        a, b = self._capture_x(rect), self._capture_spectacle(rect)
+        stale = a is not None and b is not None and a.shape == b.shape \
+            and np.abs(a.astype(np.int16) - b.astype(np.int16)).mean() > 12
+        mode = "spectacle" if stale else "x11"
+        if mode != self._cap_mode and stale:
+            self.notes.append("X11 picture of the game is stale under Wayland; using spectacle (slower)")
+        self._cap_mode = mode
+        return mode
+
+    def _capture_x(self, rect):
         x, y, w, h = rect
         img = None
         if self.x:

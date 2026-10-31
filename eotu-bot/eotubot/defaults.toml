@@ -14,6 +14,8 @@ relaunch = true                          # start the game again if it closes or 
 
 [input]
 backend = "auto"         # Linux only: auto, xtest or uinput. Windows always uses SendInput.
+capture = "auto"         # Linux only: auto, x11 or spectacle. Under Wayland the X11 picture of a Proton
+                         # game can go stale; auto checks it against spectacle and switches if so.
 failsafe_corner = true   # pushing the mouse into the top-left corner stops the bot
 park = "@0.5,0.12"       # where the mouse rests between actions (off the buttons, away from the edges)
 screen_size = [1280, 800]  # only used when the bot can't ask X11 (uinput without X)
@@ -254,15 +256,16 @@ optional = true
 
 [macros]
 # The multiplayer mod. The host runs host_lobby then start_match; the other PC runs join_lobby.
-host_lobby = ["click mp_menu_button", "wait 3", "click mp_host_button", "wait 5"]
+# EotUMP opens its screen with F8 anywhere. Its main-menu entry is only added on the first visit to
+# the menu (gone after leaving a match, mod 0.1.0), so the macros don't rely on it.
+host_lobby = ["key f8", "wait 3", "click mp_host_button", "wait 5"]
 join_lobby = [
-  "click mp_menu_button", "wait 3",
-  "click mp_join_button", "wait 3",
+  "key f8", "wait 3",
   "if mp_lobby_first: dclick mp_lobby_first",
   "if mp_address_box: click mp_address_box",
   "if mp_address_box: key ctrl+a",
   "if mp_address_box: type {host_ip}",
-  "if mp_address_box: key enter",
+  "click mp_join_button",
   "if mp_join_confirm: click mp_join_confirm",
   "wait 5",
 ]
