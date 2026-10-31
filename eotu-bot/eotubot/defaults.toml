@@ -1,0 +1,388 @@
+# Empires of the Undergrowth bot: built-in settings.
+#
+# Don't edit this file. Put changes in settings.toml in the bot's data folder (`eotubot check`
+# prints where it is). A key there replaces the same key here; tables are merged.
+
+[game]
+steam_app_id = 463530
+launch = "steam://rungameid/463530"      # used to start the game again after a crash
+title = "Undergrowth"                    # the game window's title contains this (regex)
+class = "UnrealWindow|steam_app_463530"  # its window class: Windows = UnrealWindow, Proton = steam_app_<id>
+not_title = "Mozilla|Firefox|Chrome|Chromium|Edge|Explorer|Discord|Konsole|Terminal|Visual Studio| - "
+process = "Undergrowth"                  # Linux: a process whose command line contains this = game running
+relaunch = true                          # start the game again if it closes or crashes
+
+[input]
+backend = "auto"         # Linux only: auto, xtest or uinput. Windows always uses SendInput.
+failsafe_corner = true   # pushing the mouse into the top-left corner stops the bot
+park = "@0.5,0.12"       # where the mouse rests between actions (off the buttons, away from the edges)
+screen_size = [1280, 800]  # only used when the bot can't ask X11 (uinput without X)
+
+[timing]
+tick = 0.5            # seconds between looks at the screen during a match
+click_hold = 0.06     # how long a mouse button is held
+step_pause = 0.25     # pause after every macro step
+wait_scale = 1.0      # multiplies every "wait" in the macros: raise it on a slow PC
+status_every = 5      # seconds between status messages to the other bot
+frozen_after = 45     # the picture hasn't changed for this long in a match: report "frozen"
+hung_after = 240      # frozen this long: give up on the match
+unknown_after = 60    # a screen the bot doesn't recognise, this long in a match: report it
+end_grace = 90        # how long the other PC may take to see the same match end
+match_limit = 2700    # 45 minutes: both bots leave the match (stalemate)
+menu_timeout = 90     # getting back to the main menu
+lobby_timeout = 180   # hosting / joining
+load_timeout = 240    # from "start" to the match screen
+lobby_settle = 5      # the host waits this long after the other bot joined before starting
+shot_every = 120      # a half-size screenshot every this many seconds of a match (0 = never)
+
+[link]
+port = 47390          # the two bots talk over this TCP port (the host PC listens)
+ping_every = 10
+dead_after = 45
+
+[detect]
+# Screens the bot recognises from small pictures it saved while you taught it.
+order = ["menu", "lobby", "match", "nest", "pause", "victory", "defeat", "disconnected"]
+priority = ["victory", "defeat", "disconnected", "pause", "menu", "lobby", "nest", "match"]
+in_match = ["match", "nest", "pause"]
+threshold = 0.90      # how alike a saved picture and the screen must be (0-1)
+patch = 0.05          # size of each saved picture, as a share of the window height
+
+[screens.menu]
+title = "Main menu"
+how = "Start the game and leave it on the main menu."
+
+[screens.lobby]
+title = "Multiplayer lobby"
+how = "Open the multiplayer mod's lobby (the screen with Host and Join)."
+
+[screens.match]
+title = "In a match, surface view"
+how = "Start a match (multiplayer, or a Skirmish on the map you'll test with) and look at the surface."
+
+[screens.nest]
+title = "In a match, inside your nest"
+how = "Left-click your nest's minimap so the camera moves inside your nest."
+
+[screens.pause]
+title = "Pause menu"
+how = "In a match, press Escape to open the pause menu."
+
+[screens.victory]
+title = "Victory screen"
+how = "When you win a match. Can be taught later: `eotubot teach victory`."
+optional = true
+
+[screens.defeat]
+title = "Defeat screen"
+how = "When you lose a match. Can be taught later: `eotubot teach defeat`."
+optional = true
+
+[screens.disconnected]
+title = "Connection lost message"
+how = "The message the multiplayer mod shows when the other player drops. Teach it if you ever see it."
+optional = true
+
+# --- Spots: places on the screen the bot clicks or watches. `teach` asks you to point at each.
+# watch = the bot saves a small picture there to recognise the screen.
+# optional = you can skip it; macros only use it with "if <spot>:".
+# prep = something to do in the game first.
+
+[spots.mp_menu_button]
+screen = "menu"
+ask = "the main-menu button that opens the multiplayer mod"
+watch = true
+
+[spots.menu_logo]
+screen = "menu"
+ask = "the game's logo or another part of the main menu that never changes"
+watch = true
+optional = true
+
+[spots.mp_host_button]
+screen = "lobby"
+ask = "the button that hosts (creates) a game"
+watch = true
+
+[spots.mp_join_button]
+screen = "lobby"
+ask = "the button that joins a game"
+watch = true
+
+[spots.mp_lobby_first]
+screen = "lobby"
+ask = "the first game in the list of games to join (skip if you join by typing an IP address)"
+optional = true
+
+[spots.mp_address_box]
+screen = "lobby"
+ask = "the box where you type the host's IP address (skip if there isn't one)"
+optional = true
+
+[spots.mp_join_confirm]
+screen = "lobby"
+ask = "the button that confirms joining after picking a game or typing the address (skip if none)"
+optional = true
+
+[spots.mp_ready_button]
+screen = "lobby"
+ask = "the Ready button (skip if the lobby has none)"
+optional = true
+
+[spots.mp_start_button]
+screen = "lobby"
+prep = "Host a game the way you normally would, so the start button shows."
+ask = "the button the host presses to start the match"
+
+[spots.mp_back_button]
+screen = "lobby"
+ask = "the lobby's Back or Leave button (skip if none)"
+optional = true
+
+[spots.pher_group_1]
+screen = "match"
+ask = "pheromone group I in the control panel (bottom middle)"
+watch = true
+
+[spots.pher_group_2]
+screen = "match"
+ask = "pheromone group II in the control panel"
+watch = true
+optional = true
+
+[spots.hud_frame]
+screen = "match"
+ask = "a part of the bottom panel that never changes, such as its frame or a fixed icon"
+watch = true
+optional = true
+
+[spots.ctrl_new_group]
+screen = "match"
+ask = "the first ant icon in the Nest group of the control panel (new ants show up there)"
+optional = true
+
+[spots.minimap_tl]
+screen = "match"
+ask = "the TOP-LEFT corner of the surface minimap (bottom-left of the screen)"
+
+[spots.minimap_br]
+screen = "match"
+ask = "the BOTTOM-RIGHT corner of the surface minimap"
+
+[spots.map_own_nest]
+screen = "match"
+ask = "your own nest entrance, on the surface minimap"
+
+[spots.map_enemy_nest]
+screen = "match"
+ask = "the other colony's nest, on the surface minimap (where it is, even if you can't see it)"
+
+[spots.map_middle]
+screen = "match"
+ask = "the middle of the map, on the surface minimap"
+
+[spots.nest_minimap]
+screen = "match"
+ask = "your underground nest's minimap (left-clicking it moves the camera into your nest)"
+
+[spots.nest_spot_1]
+screen = "nest"
+ask = "an empty dug-out spot in your nest where a chamber can be built"
+
+[spots.nest_spot_2]
+screen = "nest"
+ask = "another empty dug-out spot (skip if there's no room)"
+optional = true
+
+[spots.nest_spot_3]
+screen = "nest"
+ask = "a third empty dug-out spot (skip if there's no room)"
+optional = true
+
+[spots.brood_worker]
+screen = "nest"
+prep = "Press O to open the Brood menu."
+ask = "the worker brood chamber in the Brood menu"
+
+[spots.brood_soldier]
+screen = "nest"
+ask = "the soldier (or major) brood chamber in the Brood menu"
+
+[spots.menu_quit_match]
+screen = "pause"
+ask = "the pause-menu button that leaves the match (quit to main menu)"
+watch = true
+
+[spots.menu_quit_confirm]
+screen = "pause"
+prep = "Click the quit button so the 'are you sure?' question shows. Skip if it doesn't ask."
+ask = "the button that confirms leaving"
+optional = true
+
+[spots.victory_text]
+screen = "victory"
+ask = "the big title on the victory screen"
+watch = true
+
+[spots.end_continue_button]
+screen = "victory"
+ask = "the button that leaves the end screen (Continue / Main menu)"
+optional = true
+
+[spots.defeat_text]
+screen = "defeat"
+ask = "the big title on the defeat screen"
+watch = true
+
+[spots.disconnected_text]
+screen = "disconnected"
+ask = "the connection-lost message"
+watch = true
+
+[spots.disconnected_ok]
+screen = "disconnected"
+ask = "the button that closes that message (skip if none)"
+optional = true
+
+# --- Macros: what each action does, step by step. Steps:
+#   click SPOT | rclick SPOT | dclick SPOT | move SPOT | drag SPOT SPOT
+#   key NAME (key o, key escape, key ctrl+s) | type TEXT ({host_ip} = the host PC's address)
+#   scroll N [SPOT] | wait SECONDS | run MACRO | wait_for SCREEN [SECONDS]
+#   "if SPOT: step" runs the step only when you taught that spot.
+# SPOT can also be nest_spot_* (a random one of those), map_random (a random point on the
+# surface minimap) or @0.5,0.4 (that share of the window's width and height).
+
+[macros]
+# The multiplayer mod. The host runs host_lobby then start_match; the other PC runs join_lobby.
+host_lobby = ["click mp_menu_button", "wait 3", "click mp_host_button", "wait 5"]
+join_lobby = [
+  "click mp_menu_button", "wait 3",
+  "click mp_join_button", "wait 3",
+  "if mp_lobby_first: dclick mp_lobby_first",
+  "if mp_address_box: click mp_address_box",
+  "if mp_address_box: key ctrl+a",
+  "if mp_address_box: type {host_ip}",
+  "if mp_address_box: key enter",
+  "if mp_join_confirm: click mp_join_confirm",
+  "wait 5",
+]
+ready = ["if mp_ready_button: click mp_ready_button", "wait 1"]
+start_match = ["click mp_start_button", "wait 2"]
+leave_lobby = ["if mp_back_button: click mp_back_button", "wait 1", "key escape", "wait 2"]
+leave_match = ["key escape", "wait 1.5", "click menu_quit_match", "wait 1.5",
+               "if menu_quit_confirm: click menu_quit_confirm", "wait 6"]
+after_match = ["if end_continue_button: click end_continue_button", "wait 4"]
+close_pause_menu = ["key escape", "wait 1"]
+dismiss_disconnect = ["if disconnected_ok: click disconnected_ok", "wait 1", "key escape", "wait 2"]
+
+# In a match. Orders go to pheromone group I (II for scouting) by right-clicking the minimap.
+build_worker = ["click nest_minimap", "wait 0.6", "key o", "wait 0.5", "click brood_worker",
+                "wait 0.3", "click nest_spot_*", "wait 0.3", "key o"]
+build_soldier = ["click nest_minimap", "wait 0.6", "key o", "wait 0.5", "click brood_soldier",
+                 "wait 0.3", "click nest_spot_*", "wait 0.3", "key o"]
+assign_new_ants = ["drag ctrl_new_group pher_group_1"]
+attack_enemy_nest = ["click pher_group_1", "rclick map_enemy_nest"]
+raid_middle = ["click pher_group_1", "rclick map_middle"]
+defend_nest = ["click pher_group_1", "rclick map_own_nest"]
+scout = ["click pher_group_2", "rclick map_random"]
+spam_markers = ["click pher_group_1", "rclick map_random", "rclick map_random", "rclick map_random",
+                "rclick map_random", "rclick map_random", "rclick map_enemy_nest"]
+pause_flick = ["key escape", "wait 1", "key escape"]
+
+# --- Strategies: how a match is played. Each rule runs a macro:
+#   every = seconds between runs, from / until = match time window (seconds),
+#   when = a condition, once = true runs it one time, chance = probability per turn.
+# Conditions can use: t (match seconds), own (your dots on the minimap), enemy (enemy dots you
+# can see), threat (enemy dots near your nest), grown (own / own at the start).
+# The bot picks a strategy each match, favouring the ones that win (learn = false: never
+# counted). Every time varies by up to [strategy] jitter each match, so no two games are alike.
+
+[strategy]
+jitter = 0.2
+chaos_share = 0.15    # share of matches played with "chaos" (finds mod bugs fastest)
+random_pool = ["build_worker", "build_soldier", "assign_new_ants", "attack_enemy_nest",
+               "raid_middle", "defend_nest", "scout"]
+
+[strategies.balanced]
+note = "Workers first, a steady stream of soldiers, attack the nest once the colony has grown."
+rules = [
+  { do = "build_worker", every = 50, from = 5, until = 420 },
+  { do = "build_soldier", every = 40, from = 60 },
+  { do = "assign_new_ants", every = 30, from = 20 },
+  { do = "defend_nest", every = 25, when = "threat > 15" },
+  { do = "attack_enemy_nest", every = 90, from = 360, when = "grown >= 1.5 or t >= 600" },
+]
+
+[strategies.rush]
+note = "Soldiers from the start, poke the middle, then hit the nest early and keep hitting it."
+rules = [
+  { do = "build_worker", once = true, from = 5 },
+  { do = "build_soldier", every = 25, from = 15 },
+  { do = "assign_new_ants", every = 20, from = 15 },
+  { do = "raid_middle", once = true, from = 90 },
+  { do = "attack_enemy_nest", every = 60, from = 150 },
+]
+
+[strategies.boom]
+note = "Economy first: lots of workers, soldiers later, one big attack."
+rules = [
+  { do = "build_worker", every = 30, from = 5, until = 600 },
+  { do = "build_soldier", every = 45, from = 300 },
+  { do = "assign_new_ants", every = 40, from = 30 },
+  { do = "defend_nest", every = 20, when = "threat > 10" },
+  { do = "attack_enemy_nest", every = 120, from = 720, when = "grown >= 2 or t >= 1200" },
+]
+
+[strategies.turtle]
+note = "Holds the nest, answers every raid, only attacks when clearly bigger."
+rules = [
+  { do = "build_worker", every = 60, from = 5 },
+  { do = "build_soldier", every = 35, from = 30 },
+  { do = "assign_new_ants", every = 30, from = 20 },
+  { do = "defend_nest", every = 30, from = 60 },
+  { do = "attack_enemy_nest", every = 120, from = 900, when = "own > 2 * enemy or t >= 1800" },
+]
+
+[strategies.raider]
+note = "Many small raids: scouts with group II, hits the middle, then the nest."
+rules = [
+  { do = "build_worker", every = 60, from = 5 },
+  { do = "build_soldier", every = 30, from = 20 },
+  { do = "assign_new_ants", every = 25, from = 20 },
+  { do = "scout", every = 45, from = 60 },
+  { do = "raid_middle", every = 70, from = 120 },
+  { do = "attack_enemy_nest", every = 100, from = 420 },
+]
+
+[strategies.chaos]
+note = "Stress test for the mod: random actions fast, marker spam, pause-menu flicks."
+learn = false
+rules = [
+  { do = "*", every = 3, from = 5 },
+  { do = "spam_markers", every = 8, from = 10 },
+  { do = "pause_flick", every = 50, from = 30 },
+]
+
+[minimap]
+# Which minimap pixels are your ants (green) and enemies (red). r, g, b = 0-255.
+own = "g > 110 and g > 1.4 * r and g > 1.4 * b"
+enemy = "r > 120 and r > 1.6 * g and r > 1.6 * b"
+near_nest = 0.15      # "threat" = enemy dots within this share of the minimap around your nest
+
+[logs]
+# Files changed during a match are copied into its folder (biggest first, newest part kept).
+# {LOCALAPPDATA}, {PROTON_LOCAL} (the game's AppData\Local under Proton), {GAME_DIR}, {HOME}.
+paths = [
+  "{LOCALAPPDATA}/*/Saved/Logs/*.log",
+  "{LOCALAPPDATA}/*/Saved/Crashes/*/*",
+  "{PROTON_LOCAL}/*/Saved/Logs/*.log",
+  "{PROTON_LOCAL}/*/Saved/Crashes/*/*",
+  "{GAME_DIR}/**/*.log",
+]
+max_mb = 4
+max_files = 30
+
+[evidence]
+frames = 8            # recent screenshots kept in memory, saved when something goes wrong
+send_to_host = true   # the joining PC sends its screenshots and logs to the host after each match
+max_send_mb = 40
