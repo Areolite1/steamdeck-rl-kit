@@ -202,6 +202,75 @@ def cmd_teach_at(args, ctx):
     return 0
 
 
+def _point(x, y, rect):
+    """'x y' in window pixels, or '@fx,fy' shares -> a screen point."""
+    rx, ry, w, h = rect
+    if x.startswith("@"):
+        fx, fy = (float(v) for v in x[1:].split(","))
+        return int(round(rx + fx * w)), int(round(ry + fy * h))
+    if y is None:
+        raise SystemExit("Give x and y (pixels inside the game window), or @fx,fy")
+    return int(round(rx + float(x))), int(round(ry + float(y)))
+
+
+def cmd_click(args, ctx):
+    """Clicks the game once at a position (for setting things up by hand or by another program)."""
+    game = ctx.game()
+    rect = game.find(force=True)
+    if not rect:
+        print("The game window isn't there.")
+        return 1
+    px, py = _point(args.x, args.y, rect)
+    game.p.focus_game()
+    time.sleep(0.1)
+    if args.drag_to:
+        tx, ty = _point(args.drag_to, None, rect) if args.drag_to.startswith("@") else \
+            _point(*args.drag_to.split(","), rect)
+        game.p.move(px, py)
+        time.sleep(0.05)
+        game.p.button("left", True)
+        try:
+            for i in range(1, 11):
+                time.sleep(0.03)
+                game.p.move(px + (tx - px) * i // 10, py + (ty - py) * i // 10)
+            time.sleep(0.1)
+        finally:
+            game.p.button("left", False)
+        print(f"Dragged ({px}, {py}) -> ({tx}, {ty})")
+        return 0
+    game.p.move(px, py)
+    time.sleep(0.05)
+    for _ in range(2 if args.double else 1):
+        game.p.button(args.button, True)
+        time.sleep(0.06)
+        game.p.button(args.button, False)
+        time.sleep(0.07)
+    print(f"{args.button} click at ({px}, {py})")
+    return 0
+
+
+def cmd_key(args, ctx):
+    game = ctx.game()
+    if game.find(force=True):
+        game.p.focus_game()
+        time.sleep(0.1)
+    for combo in args.keys:
+        game.key(combo)
+        time.sleep(0.1)
+    print("Pressed " + ", ".join(args.keys))
+    return 0
+
+
+def cmd_type(args, ctx):
+    game = ctx.game()
+    if game.find(force=True):
+        game.p.focus_game()
+        time.sleep(0.1)
+    game.type(args.text)
+    print(f"Typed {args.text!r}")
+    return 0
+
+
 def cmd_forget(args, ctx):
     prof = Profile(ctx.data)
     for name in args.spots:
@@ -359,6 +428,16 @@ def main(argv=None):
     p.add_argument("y", nargs="?")
     p = sub.add_parser("shot", help="save a screenshot of the game (and a copy with a grid)")
     p.add_argument("path", nargs="?")
+    p = sub.add_parser("click", help="click the game at x y (window pixels) or @fx,fy")
+    p.add_argument("x")
+    p.add_argument("y", nargs="?")
+    p.add_argument("--button", choices=("left", "right", "middle"), default="left")
+    p.add_argument("--double", action="store_true")
+    p.add_argument("--drag-to", help="drag to 'x,y' (window pixels) or @fx,fy instead of clicking")
+    p = sub.add_parser("key", help="press keys in the game: key escape | key o | key ctrl+a")
+    p.add_argument("keys", nargs="+")
+    p = sub.add_parser("type", help="type text into the game")
+    p.add_argument("text")
     p = sub.add_parser("forget", help="forget taught spots")
     p.add_argument("spots", nargs="+")
     p = sub.add_parser("watch", help="print what the bot sees")
@@ -384,7 +463,7 @@ def main(argv=None):
     args = ap.parse_args(argv)
     ctx = Ctx(args)
     handlers = {"check": cmd_check, "teach": cmd_teach, "teach-at": cmd_teach_at, "shot": cmd_shot,
-                "forget": cmd_forget, "watch": cmd_watch,
+                "click": cmd_click, "key": cmd_key, "type": cmd_type, "forget": cmd_forget, "watch": cmd_watch,
                 "try": cmd_try, "run": cmd_run, "pause": cmd_flag, "resume": cmd_flag, "stop": cmd_flag,
                 "report": cmd_report, "settings": cmd_settings}
     try:
